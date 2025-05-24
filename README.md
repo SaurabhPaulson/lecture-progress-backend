@@ -1,79 +1,113 @@
 # Lecture Progress Tracking Backend
 
-This project is a backend application built with Node.js, Express, and PostgreSQL to track user progress on lecture videos. It allows users to save and resume their viewing progress based on unique viewing intervals.
+A Node.js, Express, and PostgreSQL backend to track user progress on lecture videos, supporting unique viewing intervals and progress resumption.
 
-## Table of Contents
+## Features
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Design Decisions](#design-decisions)
+- Save and merge user video viewing intervals
+- Retrieve progress for any user/video
+- Calculates unique viewing time and percentage
+- RESTful API with clear endpoints
+- Environment-based configuration
+- Modular code structure
 
-## Installation
+## Getting Started
 
-1. Clone the repository:
-   ```
+### Prerequisites
+
+- Node.js (v14+ recommended)
+- PostgreSQL
+
+### Installation
+
+1. **Clone the repository:**
+   ```sh
    git clone <repository-url>
-   ```
-2. Navigate to the project directory:
-   ```
    cd lecture-progress-backend
    ```
-3. Install the dependencies:
-   ```
+
+2. **Install dependencies:**
+   ```sh
    npm install
    ```
-4. Create a `.env` file in the root directory and add your PostgreSQL connection details:
-   ```
-   DATABASE_URL=your_database_url
+
+3. **Configure environment:**
+   Create a `.env` file in the root directory:
+   ```env
+   PORT=3000
+   NODE_ENV=development
+   DB_USER=postgres
+   DB_HOST=localhost
+   DB_NAME=saurabh-development-db
+   DB_PASSWORD=postgres
+   DB_PORT=5432
    ```
 
-## Usage
+4. **Set up the database:**
+   Create the required table:
+   ```sql
+   CREATE TABLE lecture_progress (
+     id SERIAL PRIMARY KEY,
+     user_id VARCHAR NOT NULL,
+     video_id VARCHAR NOT NULL,
+     start_time NUMERIC NOT NULL,
+     end_time NUMERIC NOT NULL
+   );
+   ```
 
-To start the server, run:
-```
+### Running the Server
+
+```sh
 npm start
 ```
-The server will be running on `http://localhost:3000`.
+Server runs at [http://localhost:3000](http://localhost:3000).
 
 ## API Endpoints
 
 ### Save Progress
-- **Endpoint:** `POST /progress`
-- **Description:** Saves the user's viewing intervals.
-- **Request Body:**
+
+- **POST** `/api/progress`
+- **Body:**
   ```json
   {
     "userId": "string",
-    "intervals": [
-      {
-        "start": "timestamp",
-        "end": "timestamp"
-      }
-    ]
+    "videoId": "string",
+    "intervals": [{ "start": 0, "end": 120 }],
+    "videoDuration": 300
+  }
+  ```
+- **Response:**
+  ```json
+  {
+    "message": "Progress saved",
+    "progress": 40,
+    "intervals": [{ "start": 0, "end": 120 }]
   }
   ```
 
 ### Get Progress
-- **Endpoint:** `GET /progress/:userId`
-- **Description:** Retrieves the user's progress data.
+
+- **GET** `/api/progress/:userId/:videoId`
 - **Response:**
   ```json
   {
-    "userId": "string",
-    "progress": [
-      {
-        "start": "timestamp",
-        "end": "timestamp"
-      }
-    ]
+    "intervals": [{ "start": 0, "end": 120 }]
   }
   ```
 
-## Design Decisions
+## Project Structure
 
-- **Database Choice:** PostgreSQL was chosen for its robustness and support for complex queries.
-- **Interval Management:** Utility functions are implemented to handle merging of overlapping intervals, ensuring accurate tracking of unique viewing time.
-- **Separation of Concerns:** The project is structured to separate routes, controllers, models, and utilities for better maintainability and scalability.
+- `src/app.js` – Express app entry point
+- `src/routes/` – API route definitions
+- `src/controllers/` – Request handlers
+- `src/models/` – Database queries
+- `src/services/` – Business logic
+- `src/utils/` – Utility functions
 
-This README provides a comprehensive overview of the project setup, usage, and design rationale. For further details, please refer to the source code and comments within the files.
+## Contributing
+
+Pull requests are welcome! For major changes, please open an issue first.
+
+## License
+
+[ISC](LICENSE)
